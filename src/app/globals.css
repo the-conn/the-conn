@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #1a1a1a;
+  --ink-soft: #3a3a3a;
+  --ink-faint: #888888;
+  --ink-trace: #c8c4bc;
+
+  --paper: #fafaf6;
+  --paper-2: #f1ede2;
+  --paper-3: #e8e3d4;
+
+  --status-emerald: #3aaa88;
+  --status-emerald-soft: #c5e7d8;
+  --status-rose: #dd4444;
+  --status-rose-soft: #f3c8c8;
+  --status-amber: #dca838;
+  --status-amber-soft: #f5e6b8;
+  --status-slate: #b8b3a4;
+  --status-slate-soft: #e3dfd2;
+}
+
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family:
+    var(--font-ui),
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--ink-trace);
+  border-radius: 3px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}

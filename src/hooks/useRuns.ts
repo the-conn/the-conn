@@ -1,0 +1,45 @@
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { SIDEBAR_LIMIT } from '@/services/apiClient';
+import { queryKeys } from '@/services/queryKeys';
+import { listRuns } from '@/services/runs';
+import type { Run, RunFilters } from '@/types/api';
+
+export interface UseRunsResult {
+  runs: Run[];
+  isLoading: boolean;
+  isFetching: boolean;
+  error: Error | null;
+  hasMore: boolean;
+  page: number;
+  limit: number;
+}
+
+const EMPTY_FILTERS: RunFilters = {};
+
+export function useRuns(page: number, filters: RunFilters = EMPTY_FILTERS): UseRunsResult {
+  const limit = SIDEBAR_LIMIT;
+  const query = useQuery({
+    queryKey: queryKeys.runs.list(page, limit, filters),
+    queryFn: () =>
+      listRuns({
+        limit,
+        offset: page * limit,
+        sort_by: 'created_at',
+        order: 'desc',
+        filters,
+      }),
+    refetchInterval: 30_000,
+    refetchIntervalInBackground: false,
+    placeholderData: keepPreviousData,
+  });
+  const runs = query.data ?? [];
+  return {
+    runs,
+    isLoading: query.isLoading,
+    isFetching: query.isFetching,
+    error: query.error as Error | null,
+    hasMore: runs.length === limit,
+    page,
+    limit,
+  };
+}

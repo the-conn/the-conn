@@ -1,0 +1,11 @@
+.next/
+out/
+build/
+dist/
+node_modules/
+design/
+package-lock.json
+*.min.js
+*.min.css
+public/
+next-env.d.ts
