@@ -85,8 +85,9 @@ export default function Home() {
       setIsLoadingPipeline(true);
       setSelectedPipeline(name);
       const pipeline = await loadPipeline(name);
-      setEditorContent(pipeline.yaml);
-      editorRef.current?.setValue(pipeline.yaml);
+      const yaml = pipeline.yaml ?? '';
+      setEditorContent(yaml);
+      editorRef.current?.setValue(yaml);
     } catch (err) {
       toast.error('Failed to load pipeline', {
         description: err instanceof Error ? err.message : 'Unknown error',
