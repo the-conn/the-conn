@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -41,14 +41,18 @@ export default function Home() {
   const [isSaving, setIsSaving] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [isLoadingPipeline, setIsLoadingPipeline] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const editorRef = useRef<any>(null);
 
   const loadDefault = useCallback(async () => {
     try {
       const yaml = await getDefaultPipeline();
       setEditorContent(yaml);
+      editorRef.current?.setValue(yaml);
     } catch (err) {
       console.error('Failed to fetch default pipeline, using fallback', err);
       setEditorContent(FALLBACK_YAML);
+      editorRef.current?.setValue(FALLBACK_YAML);
     }
   }, []);
 
@@ -82,6 +86,7 @@ export default function Home() {
       setSelectedPipeline(name);
       const pipeline = await loadPipeline(name);
       setEditorContent(pipeline.yaml);
+      editorRef.current?.setValue(pipeline.yaml);
     } catch (err) {
       toast.error('Failed to load pipeline', {
         description: err instanceof Error ? err.message : 'Unknown error',
@@ -189,10 +194,12 @@ export default function Home() {
         {/* Editor */}
         <div className="flex-1 overflow-hidden relative">
           <MonacoEditor
-            key={selectedPipeline ?? 'new'}
             height="100%"
             defaultLanguage="yaml"
             value={editorContent}
+            onMount={(editor) => {
+              editorRef.current = editor;
+            }}
             onChange={(value) => setEditorContent(value ?? '')}
             theme="vs-dark"
             options={{
