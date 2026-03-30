@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "The Conn Dashboard",
+  title: "The Conn",
   description: "CI/CD Server Management Dashboard",
 };
 

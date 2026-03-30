@@ -1,4 +1,4 @@
-# The Conn Dashboard
+# The Conn
 
 A CI/CD Server Management Dashboard built with Next.js, Tailwind CSS, Monaco Editor, and shadcn UI components.
 

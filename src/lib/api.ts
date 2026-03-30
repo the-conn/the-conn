@@ -71,12 +71,25 @@ export async function savePipeline(name: string, yaml: string): Promise<void> {
   if (!res.ok) throw new Error(`Failed to save pipeline: ${res.statusText}`);
 }
 
+interface PipelineGetResponse {
+  name: string;
+  yaml?: string;
+  nodes?: PipelineNode[];
+}
+
 export async function loadPipeline(name: string): Promise<{ name: string; yaml: string }> {
   const res = await fetch(`${BASE_URL}/pipelines/${encodeURIComponent(name)}`, {
     headers: tracingHeaders(),
   });
   if (!res.ok) throw new Error(`Failed to load pipeline: ${res.statusText}`);
-  return res.json();
+  const data: PipelineGetResponse = await res.json();
+  if (typeof data.yaml === 'string') {
+    return { name: data.name, yaml: data.yaml };
+  }
+  if (Array.isArray(data.nodes)) {
+    return { name: data.name, yaml: pipelineToYaml({ name: data.name, nodes: data.nodes }) };
+  }
+  throw new Error(`Pipeline "${name}" returned no content`);
 }
 
 export async function runPipeline(yaml: string): Promise<void> {

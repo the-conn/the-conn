@@ -1,11 +1,26 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { fetchPipelines, savePipeline, loadPipeline, runPipeline, getDefaultPipeline } from '@/lib/api';
+
+const MIN_FEEDBACK_MS = 500;
+
+function extractNameFromYaml(yaml: string): string {
+  const match = yaml.match(/^name:\s*(.+)$/m);
+  if (!match) return '';
+  const raw = match[1].trim();
+  if (raw.startsWith('"') || raw.startsWith("'")) {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return raw.slice(1, -1);
+    }
+  }
+  return raw;
+}
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
 
@@ -22,18 +37,22 @@ export default function Home() {
   const [pipelines, setPipelines] = useState<string[]>([]);
   const [loadingPipelines, setLoadingPipelines] = useState(true);
   const [selectedPipeline, setSelectedPipeline] = useState<string | null>(null);
-  const [pipelineName, setPipelineName] = useState('');
   const [editorContent, setEditorContent] = useState(FALLBACK_YAML);
   const [isSaving, setIsSaving] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
+  const [isLoadingPipeline, setIsLoadingPipeline] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const editorRef = useRef<any>(null);
 
   const loadDefault = useCallback(async () => {
     try {
       const yaml = await getDefaultPipeline();
       setEditorContent(yaml);
+      editorRef.current?.setValue(yaml);
     } catch (err) {
       console.error('Failed to fetch default pipeline, using fallback', err);
       setEditorContent(FALLBACK_YAML);
+      editorRef.current?.setValue(FALLBACK_YAML);
     }
   }, []);
 
@@ -58,46 +77,56 @@ export default function Home() {
 
   const handleNew = () => {
     setSelectedPipeline(null);
-    setPipelineName('');
     loadDefault();
   };
 
   const handleSelectPipeline = async (name: string) => {
     try {
+      setIsLoadingPipeline(true);
       setSelectedPipeline(name);
       const pipeline = await loadPipeline(name);
-      setPipelineName(pipeline.name);
-      setEditorContent(pipeline.yaml);
+      const yaml = pipeline.yaml ?? '';
+      setEditorContent(yaml);
+      editorRef.current?.setValue(yaml);
     } catch (err) {
       toast.error('Failed to load pipeline', {
         description: err instanceof Error ? err.message : 'Unknown error',
       });
+    } finally {
+      setIsLoadingPipeline(false);
     }
   };
 
   const handleSave = async () => {
-    if (!pipelineName.trim()) {
-      toast.error('Pipeline name is required');
+    const name = extractNameFromYaml(editorContent);
+    if (!name) {
+      toast.error('Pipeline name is required', {
+        description: 'Add a "name:" field to your pipeline YAML.',
+      });
       return;
     }
+    setIsSaving(true);
+    const deadline = Date.now() + MIN_FEEDBACK_MS;
     try {
-      setIsSaving(true);
-      await savePipeline(pipelineName.trim(), editorContent);
-      toast.success('Pipeline saved', { description: `"${pipelineName}" saved successfully.` });
+      await savePipeline(name, editorContent);
+      toast.success('Pipeline saved', { description: `"${name}" saved successfully.` });
       await refreshPipelines();
-      setSelectedPipeline(pipelineName.trim());
+      setSelectedPipeline(name);
     } catch (err) {
       toast.error('Failed to save pipeline', {
         description: err instanceof Error ? err.message : 'Unknown error',
       });
     } finally {
+      const remaining = deadline - Date.now();
+      if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
       setIsSaving(false);
     }
   };
 
   const handleRun = async () => {
+    setIsRunning(true);
+    const deadline = Date.now() + MIN_FEEDBACK_MS;
     try {
-      setIsRunning(true);
       await runPipeline(editorContent);
       toast.success('Pipeline triggered', { description: 'Run accepted by the server.' });
     } catch (err) {
@@ -105,6 +134,8 @@ export default function Home() {
         description: err instanceof Error ? err.message : 'Unknown error',
       });
     } finally {
+      const remaining = deadline - Date.now();
+      if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
       setIsRunning(false);
     }
   };
@@ -114,7 +145,7 @@ export default function Home() {
       {/* Sidebar */}
       <aside className="w-[280px] flex-shrink-0 border-r border-border flex flex-col bg-muted/30">
         <div className="p-4 border-b border-border">
-          <h1 className="text-lg font-semibold tracking-tight mb-3">The Conn Dashboard</h1>
+          <h1 className="text-lg font-semibold tracking-tight mb-3">The Conn</h1>
           <Button onClick={handleNew} variant="outline" size="sm" className="w-full">
             + New Pipeline
           </Button>
@@ -153,26 +184,23 @@ export default function Home() {
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Toolbar */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-background">
-          <Input
-            placeholder="Pipeline name..."
-            value={pipelineName}
-            onChange={(e) => setPipelineName(e.target.value)}
-            className="max-w-xs"
-          />
-          <Button onClick={handleSave} disabled={isSaving} variant="default" size="sm">
+          <Button onClick={handleSave} disabled={isSaving || isLoadingPipeline} variant="default" size="sm">
             {isSaving ? 'Saving...' : 'Save'}
           </Button>
-          <Button onClick={handleRun} disabled={isRunning} variant="secondary" size="sm">
+          <Button onClick={handleRun} disabled={isRunning || isLoadingPipeline} variant="secondary" size="sm">
             {isRunning ? 'Running...' : '▶ Run'}
           </Button>
         </div>
 
         {/* Editor */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden relative">
           <MonacoEditor
             height="100%"
             defaultLanguage="yaml"
             value={editorContent}
+            onMount={(editor) => {
+              editorRef.current = editor;
+            }}
             onChange={(value) => setEditorContent(value ?? '')}
             theme="vs-dark"
             options={{
@@ -186,6 +214,11 @@ export default function Home() {
               padding: { top: 16, bottom: 16 },
             }}
           />
+          {isLoadingPipeline && (
+            <div className="absolute inset-0 bg-background/70 flex items-center justify-center">
+              <span className="text-sm text-muted-foreground animate-pulse">Loading pipeline…</span>
+            </div>
+          )}
         </div>
       </main>
     </div>
