@@ -33,15 +33,18 @@ function extractNameFromYaml(yaml: string): string {
 }
 
 function statusColor(status: string): string {
-  switch (status.toLowerCase()) {
-    case 'success':
+  switch (status) {
+    case 'Success':
       return 'text-green-500';
-    case 'failed':
-    case 'failure':
-    case 'error':
+    case 'Failure':
       return 'text-red-500';
-    case 'running':
+    case 'InProgress':
       return 'text-yellow-500';
+    case 'Aborted':
+      return 'text-orange-500';
+    case 'Skipped':
+      return 'text-blue-400';
+    case 'NotStarted':
     default:
       return 'text-muted-foreground';
   }
