@@ -1,0 +1,15 @@
+name: The Conn Main Push Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+nodes:
+  - name: Build Image
+    type: build
+    checkout: true
+    config:
+      containerfile: Containerfile
+      tags:
+        - quay.io/the-conn/the-conn
