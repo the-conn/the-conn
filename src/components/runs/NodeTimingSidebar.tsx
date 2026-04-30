@@ -44,7 +44,7 @@ export function NodeTimingSidebar({ node, state }: NodeTimingSidebarProps) {
         </KV>
       </Section>
 
-      <NodeDefinitionPanel yaml={node.node_definition} />
+      <NodeDefinitionPanel definition={node.node_definition} />
     </aside>
   );
 }
