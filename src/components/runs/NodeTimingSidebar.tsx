@@ -7,7 +7,8 @@ import { NodeDefinitionPanel } from '@/components/runs/NodeDefinitionPanel';
 import { TimingBreakdown } from '@/components/runs/TimingBreakdown';
 import type { NodeExecution } from '@/types/api';
 import type { NodeState } from '@/types/ui';
-import { formatTimeUTC, parseIso } from '@/utils/time';
+import { useFormatTime } from '@/hooks/useFormatTime';
+import { parseIso } from '@/utils/time';
 
 interface NodeTimingSidebarProps {
   node: NodeExecution;
@@ -70,13 +71,14 @@ function KV({ label, children }: { label: string; children: ReactNode }) {
 }
 
 function TimestampRow({ label, iso }: { label: string; iso: string | null }) {
+  const formatTime = useFormatTime();
   return (
     <div className="flex flex-col py-[4px] border-t border-dashed border-ink-trace">
       <div className="font-mono text-[9px] tracking-[0.08em] uppercase text-ink-faint mb-px">
         {label}
       </div>
       <div className={`font-mono text-[11px] font-medium ${iso ? 'text-ink' : 'text-ink-faint'}`}>
-        {formatTimeUTC(iso)}
+        {formatTime(iso)}
       </div>
     </div>
   );

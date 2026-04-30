@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState, type ReactNode } from 'react';
+import { TimezoneModeProvider } from '@/contexts/TimezoneModeContext';
 
 interface ProvidersProps {
   children: ReactNode;
@@ -24,7 +25,7 @@ export function Providers({ children }: ProvidersProps) {
   );
   return (
     <QueryClientProvider client={client}>
-      {children}
+      <TimezoneModeProvider>{children}</TimezoneModeProvider>
       <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
     </QueryClientProvider>
   );

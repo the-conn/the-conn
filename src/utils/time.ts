@@ -67,3 +67,17 @@ export function formatTimeUTC(iso: string | null): string {
   const millis = d.getUTCMilliseconds().toString().padStart(3, '0');
   return `${date} ${time}.${millis}Z`;
 }
+
+export function formatTimeLocal(iso: string | null): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  const date = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+  const time = `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+  const millis = d.getMilliseconds().toString().padStart(3, '0');
+  const offsetMin = -d.getTimezoneOffset();
+  const sign = offsetMin >= 0 ? '+' : '-';
+  const absMin = Math.abs(offsetMin);
+  const offset = `${sign}${pad2(Math.floor(absMin / 60))}:${pad2(absMin % 60)}`;
+  return `${date} ${time}.${millis}${offset}`;
+}
