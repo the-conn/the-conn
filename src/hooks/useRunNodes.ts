@@ -3,7 +3,7 @@ import { queryKeys } from '@/services/queryKeys';
 import { getRunNodes } from '@/services/runs';
 import type { NodeExecution } from '@/types/api';
 
-const RUNNING_INTERVAL = 10_000;
+const RUNNING_INTERVAL = 5_000;
 const SETTLED_INTERVAL = 60_000;
 
 export function useRunNodes(runId: string | null, isRunning: boolean) {

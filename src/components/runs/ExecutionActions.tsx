@@ -53,7 +53,7 @@ export function ExecutionActions({ run }: ExecutionActionsProps) {
       ]);
       if (settleAbortRef.current.aborted) return;
       const latest = queryClient.getQueryData<Run>(detailKey);
-      if (latest?.cancelled && latest.completed_at !== null) return;
+      if (latest && latest.status !== 'in_progress' && latest.completed_at !== null) return;
       await new Promise((resolve) => setTimeout(resolve, SETTLE_INTERVAL_MS));
     }
   }, [queryClient, run.run_id]);

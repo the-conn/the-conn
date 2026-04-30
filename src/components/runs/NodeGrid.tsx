@@ -5,9 +5,10 @@ import type { NodeExecution } from '@/types/api';
 interface NodeGridProps {
   nodes: NodeExecution[];
   pipelineCompletedAt: string | null;
+  runTerminated: boolean;
 }
 
-export function NodeGrid({ nodes, pipelineCompletedAt }: NodeGridProps) {
+export function NodeGrid({ nodes, pipelineCompletedAt, runTerminated }: NodeGridProps) {
   return (
     <section className="flex flex-col gap-[8px]">
       <HandHeader>Nodes</HandHeader>
@@ -16,7 +17,12 @@ export function NodeGrid({ nodes, pipelineCompletedAt }: NodeGridProps) {
       ) : (
         <div className="grid gap-[8px] grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
           {nodes.map((node) => (
-            <NodeChip key={node.id} node={node} pipelineCompletedAt={pipelineCompletedAt} />
+            <NodeChip
+              key={node.id}
+              node={node}
+              pipelineCompletedAt={pipelineCompletedAt}
+              runTerminated={runTerminated}
+            />
           ))}
         </div>
       )}

@@ -41,7 +41,11 @@ export function ExecutionDeck({ runId }: ExecutionDeckProps) {
         </div>
       )}
       <GanttTimeline run={run} nodes={nodes} actions={<ExecutionActions run={run} />} />
-      <NodeGrid nodes={nodes} pipelineCompletedAt={run.completed_at} />
+      <NodeGrid
+        nodes={nodes}
+        pipelineCompletedAt={run.completed_at}
+        runTerminated={run.status !== 'in_progress'}
+      />
     </>
   );
 }

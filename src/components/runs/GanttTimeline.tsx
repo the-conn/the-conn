@@ -58,6 +58,7 @@ export function GanttTimeline({ run, nodes, actions }: GanttTimelineProps) {
   }, [isRunning]);
 
   const t0 = parseIso(run.created_at) ?? now;
+  const runTerminated = run.status !== 'in_progress';
   const model = useMemo(
     () =>
       buildGanttModel(
@@ -65,8 +66,9 @@ export function GanttTimeline({ run, nodes, actions }: GanttTimelineProps) {
         run.created_at,
         run.completed_at,
         isRunning ? now : (parseIso(run.completed_at) ?? t0),
+        runTerminated,
       ),
-    [nodes, run.created_at, run.completed_at, isRunning, now, t0],
+    [nodes, run.created_at, run.completed_at, runTerminated, isRunning, now, t0],
   );
 
   return (

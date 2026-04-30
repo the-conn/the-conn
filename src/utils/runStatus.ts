@@ -2,16 +2,22 @@ import type { NodeExecution, Run } from '@/types/api';
 import type { NodeState, RunState } from '@/types/ui';
 
 export function getRunState(run: Run): RunState {
-  if (run.cancelled) return 'cancelled';
-  if (run.success === true) return 'pass';
-  if (run.success === false) return 'fail';
-  if (run.completed_at === null) return 'running';
-  return 'cancelled';
+  switch (run.status) {
+    case 'success':
+      return 'pass';
+    case 'failure':
+      return 'fail';
+    case 'cancelled':
+      return 'cancelled';
+    case 'in_progress':
+      return 'running';
+  }
 }
 
-export function getNodeState(node: NodeExecution): NodeState {
+export function getNodeState(node: NodeExecution, runTerminated = false): NodeState {
   if (node.success === true) return 'pass';
   if (node.success === false) return 'fail';
+  if (runTerminated) return 'cancelled';
   if (node.started_at !== null && node.completed_at === null) return 'running';
   if (node.started_at === null) return 'pending';
   return 'cancelled';

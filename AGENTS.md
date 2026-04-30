@@ -32,7 +32,7 @@ This document defines the architectural patterns and coding standards for **The 
 ## 4. Data Fetching & State
 * **Polling:** Use TanStack Query for background synchronization.
   * The **Sidebar** should poll frequently (e.g., 30s).
-  * The **Pipeline Detail** should poll more aggressively (e.g., 10s) if the run status is `ENGAGED`.
+  * The **Pipeline Detail** should poll more aggressively (e.g., 5s) if the run status is `ENGAGED`.
 * **URL as Source of Truth:** The `run_id` must always be managed via the URL route (`/runs/[run_id]`). Do not store the "active run" in global state (Zustand/Redux) if it can be derived from the path.
 * **Isolation:** The "Sync" action must trigger an invalidation of the `runs` query key without affecting the `run-detail` query key.
 
@@ -45,7 +45,11 @@ This document defines the architectural patterns and coding standards for **The 
 
 ---
 
-## 6. Project Structure
+## 6. Verification
+* Run `make check` after edits to verify the change set. It runs Prettier (`format:check`), ESLint (`lint`), and TypeScript (`typecheck`) in sequence — do not invoke `npx tsc --noEmit` directly.
+* If `format:check` fails, fix it with `npx prettier --write <files>` (or `npm run format`) and re-run `make check`.
+
+## 7. Project Structure
 ```text
 src/
 ├── app/              # Next.js App Router (Pages & Layouts)
