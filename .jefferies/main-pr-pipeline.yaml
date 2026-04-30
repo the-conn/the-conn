@@ -7,7 +7,7 @@ on:
 
 nodes:
   - name: Lint and Format
-    image: docker.io/node:22-alpine
+    image: node:22-bookworm-slim
     checkout: true
     steps:
       - npm run format:check
