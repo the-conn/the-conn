@@ -1,4 +1,4 @@
-import { fetchJson } from '@/services/apiClient';
+import { fetchJson, fetchText } from '@/services/apiClient';
 import type { NodeExecution, Run, RunFilterField, RunListParams } from '@/types/api';
 
 const FILTER_FIELDS: RunFilterField[] = ['pipeline_name', 'owner', 'repo'];
@@ -25,6 +25,18 @@ export function getRun(runId: string): Promise<Run> {
 
 export function getRunNodes(runId: string): Promise<NodeExecution[]> {
   return fetchJson<NodeExecution[]>(`/api/v1/runs/${encodeURIComponent(runId)}/nodes`);
+}
+
+export function getRunNode(runId: string, nodeName: string): Promise<NodeExecution> {
+  return fetchJson<NodeExecution>(
+    `/api/v1/runs/${encodeURIComponent(runId)}/nodes/${encodeURIComponent(nodeName)}`,
+  );
+}
+
+export function getRunNodeLogs(runId: string, nodeName: string): Promise<string> {
+  return fetchText(
+    `/api/v1/runs/${encodeURIComponent(runId)}/nodes/${encodeURIComponent(nodeName)}/logs`,
+  );
 }
 
 export interface RetryResponse {

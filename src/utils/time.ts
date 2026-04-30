@@ -47,3 +47,23 @@ export function formatRelative(fromIso: string, now = Date.now()): string {
 export function shortSha(sha: string): string {
   return sha.slice(0, 7);
 }
+
+const pad2 = (n: number): string => n.toString().padStart(2, '0');
+
+export function formatElapsedMs(ms: number | null): string {
+  if (ms === null || !Number.isFinite(ms) || ms < 0) return '—';
+  const total = ms / 1000;
+  const m = Math.floor(total / 60);
+  const s = total - m * 60;
+  return `${pad2(m)}:${s.toFixed(3).padStart(6, '0')}`;
+}
+
+export function formatTimeUTC(iso: string | null): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  const date = `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`;
+  const time = `${pad2(d.getUTCHours())}:${pad2(d.getUTCMinutes())}:${pad2(d.getUTCSeconds())}`;
+  const millis = d.getUTCMilliseconds().toString().padStart(3, '0');
+  return `${date} ${time}.${millis}Z`;
+}

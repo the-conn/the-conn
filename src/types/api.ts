@@ -31,6 +31,19 @@ export interface NodeExecution {
   completed_at: string | null;
 }
 
+export type LogStream = 'stdout' | 'stderr';
+
+export interface LogLine {
+  ts: number;
+  stream: LogStream;
+  text: string;
+}
+
+export interface NodeLogsPayload {
+  raw: string;
+  lines: LogLine[];
+}
+
 export type RunFilterField = 'pipeline_name' | 'owner' | 'repo';
 
 export type RunFilters = Partial<Record<RunFilterField, string>>;

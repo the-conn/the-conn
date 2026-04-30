@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { styled } from '@linaria/react';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { HandHeader } from '@/components/ui/HandHeader';
@@ -11,6 +12,7 @@ import { buildGanttModel, pct } from '@/utils/gantt';
 import { formatDurationSeconds, formatTickOffset, parseIso } from '@/utils/time';
 
 interface GanttTimelineProps {
+  runId: string;
   run: Run;
   nodes: NodeExecution[];
   actions?: ReactNode;
@@ -47,7 +49,7 @@ const RunSeg = styled.div<{ color: string; soft: string }>`
   overflow: hidden;
 `;
 
-export function GanttTimeline({ run, nodes, actions }: GanttTimelineProps) {
+export function GanttTimeline({ runId, run, nodes, actions }: GanttTimelineProps) {
   const isRunning = getRunState(run) === 'running';
   const [now, setNow] = useState(() => Date.now());
 
@@ -125,7 +127,13 @@ export function GanttTimeline({ run, nodes, actions }: GanttTimelineProps) {
           const showWaitLabel = waitDurationSec >= 5 && runWidth > 8;
 
           return (
-            <div key={row.node.id} className="relative flex items-center" style={{ height: ROW_H }}>
+            <Link
+              key={row.node.id}
+              href={`/runs/${encodeURIComponent(runId)}/nodes/${encodeURIComponent(row.node.node_name)}`}
+              className="relative flex items-center rounded-[2px] hover:bg-paper-2 cursor-pointer"
+              style={{ height: ROW_H }}
+              title={`view ${row.node.node_name}`}
+            >
               <div className="flex items-center gap-[6px] pr-[8px]" style={{ width: LABEL_W }}>
                 <StatusGlyph state={row.state} size={11} />
                 <span
@@ -170,7 +178,7 @@ export function GanttTimeline({ run, nodes, actions }: GanttTimelineProps) {
                   </div>
                 )}
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
@@ -200,7 +208,7 @@ function Legend() {
         run (executing)
       </span>
       <Mono size={10} dim>
-        click row in sidebar to switch
+        click a node to inspect
       </Mono>
     </div>
   );

@@ -6,12 +6,13 @@ import { NodeChip } from '@/components/runs/NodeChip';
 import type { NodeExecution } from '@/types/api';
 
 interface NodeGridProps {
+  runId: string;
   nodes: NodeExecution[];
   pipelineCompletedAt: string | null;
   runTerminated: boolean;
 }
 
-export function NodeGrid({ nodes, pipelineCompletedAt, runTerminated }: NodeGridProps) {
+export function NodeGrid({ runId, nodes, pipelineCompletedAt, runTerminated }: NodeGridProps) {
   const [now, setNow] = useState(() => Date.now());
   const isTicking = !runTerminated && pipelineCompletedAt === null;
 
@@ -31,6 +32,7 @@ export function NodeGrid({ nodes, pipelineCompletedAt, runTerminated }: NodeGrid
           {nodes.map((node) => (
             <NodeChip
               key={node.id}
+              runId={runId}
               node={node}
               pipelineCompletedAt={pipelineCompletedAt}
               runTerminated={runTerminated}

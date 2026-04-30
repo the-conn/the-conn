@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Mono } from '@/components/ui/Mono';
 import { StatusGlyph } from '@/components/ui/StatusGlyph';
 import type { NodeExecution } from '@/types/api';
@@ -5,13 +6,20 @@ import { NODE_SPEC, getNodeState } from '@/utils/runStatus';
 import { formatDurationSeconds, parseIso } from '@/utils/time';
 
 interface NodeChipProps {
+  runId: string;
   node: NodeExecution;
   pipelineCompletedAt: string | null;
   runTerminated: boolean;
   nowMs: number;
 }
 
-export function NodeChip({ node, pipelineCompletedAt, runTerminated, nowMs }: NodeChipProps) {
+export function NodeChip({
+  runId,
+  node,
+  pipelineCompletedAt,
+  runTerminated,
+  nowMs,
+}: NodeChipProps) {
   const state = getNodeState(node, runTerminated);
   const spec = NODE_SPEC[state];
 
@@ -29,9 +37,11 @@ export function NodeChip({ node, pipelineCompletedAt, runTerminated, nowMs }: No
       : 0;
 
   return (
-    <div
-      className="relative overflow-hidden rounded-[3px] border-[1.5px] border-ink/85 px-[12px] py-[6px] pl-[14px]"
+    <Link
+      href={`/runs/${encodeURIComponent(runId)}/nodes/${encodeURIComponent(node.node_name)}`}
+      className="relative block overflow-hidden rounded-[3px] border-[1.5px] border-ink/85 px-[12px] py-[6px] pl-[14px] cursor-pointer transition-shadow hover:shadow-[0_0_0_1.5px_var(--ink)]"
       style={{ background: spec.softVar }}
+      title={`view ${node.node_name}`}
     >
       <span
         aria-hidden
@@ -57,6 +67,6 @@ export function NodeChip({ node, pipelineCompletedAt, runTerminated, nowMs }: No
       {state === 'pending' && (
         <div className="mt-[2px] font-mono text-[9px] text-ink-faint">queued</div>
       )}
-    </div>
+    </Link>
   );
 }

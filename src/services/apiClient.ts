@@ -39,6 +39,32 @@ export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T>
   return (await response.json()) as T;
 }
 
+export async function fetchText(path: string, init?: RequestInit): Promise<string> {
+  if (!API_BASE) {
+    throw new ApiError(0, '', 'NEXT_PUBLIC_API_BASE_URL is not configured');
+  }
+  const url = `${API_BASE}${path}`;
+  const response = await fetch(url, {
+    ...init,
+    headers: {
+      Accept: 'text/plain',
+      ...(init?.headers ?? {}),
+    },
+  });
+  if (!response.ok) {
+    const body = await response.text().catch(() => '');
+    throw new ApiError(
+      response.status,
+      body,
+      `${response.status} ${response.statusText} for ${path}`,
+    );
+  }
+  if (response.status === 204 || response.headers.get('content-length') === '0') {
+    return '';
+  }
+  return await response.text();
+}
+
 export const SIDEBAR_LIMIT = (() => {
   const raw = Number(process.env.NEXT_PUBLIC_SIDEBAR_LIMIT);
   return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : 10;

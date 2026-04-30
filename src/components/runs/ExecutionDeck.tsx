@@ -40,8 +40,14 @@ export function ExecutionDeck({ runId }: ExecutionDeckProps) {
           failed to load nodes: {nodesQuery.error.message}
         </div>
       )}
-      <GanttTimeline run={run} nodes={nodes} actions={<ExecutionActions run={run} />} />
+      <GanttTimeline
+        runId={runId}
+        run={run}
+        nodes={nodes}
+        actions={<ExecutionActions run={run} />}
+      />
       <NodeGrid
+        runId={runId}
         nodes={nodes}
         pipelineCompletedAt={run.completed_at}
         runTerminated={run.status !== 'in_progress'}

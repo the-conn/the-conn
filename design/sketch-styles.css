@@ -1,0 +1,210 @@
+/* Shared sketchy/wireframe styling for The Conn dashboard variations */
+
+:root {
+  --ink: #1a1a1a;
+  --ink-soft: #3a3a3a;
+  --ink-faint: #888;
+  --ink-trace: #c8c4bc;
+  --paper: #fafaf6;
+  --paper-2: #f1ede2;
+  --paper-3: #e8e3d4;
+  --hatch: #d8d2c0;
+
+  --status-red: #d44;
+  --status-red-soft: #f3c8c8;
+  --status-yellow: #dca838;
+  --status-yellow-soft: #f5e6b8;
+  --status-green: #3a8;
+  --status-green-soft: #c5e7d8;
+  --status-blue: #4a7aa8;
+  --status-blue-soft: #cbd9e9;
+  --status-grey: #b8b3a4;
+
+  --mono: "JetBrains Mono", "Courier New", monospace;
+  --ui: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.sk-wire {
+  font-family: var(--ui);
+  background: var(--paper);
+  color: var(--ink);
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+/* Sketchy borders — slight roughness via dashed/double strokes */
+.sk-box {
+  border: 1.5px solid var(--ink);
+  border-radius: 3px;
+  background: var(--paper);
+  position: relative;
+}
+.sk-box.dashed { border-style: dashed; border-width: 1.2px; }
+.sk-box.thick { border-width: 2px; }
+.sk-box.wob { border-radius: 4px 6px 3px 5px; }
+
+/* placeholder hatch — for spaces that should hold imagery/data */
+.sk-hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0,
+    transparent 6px,
+    var(--hatch) 6px,
+    var(--hatch) 7px
+  );
+}
+.sk-hatch-tight {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0,
+    transparent 3px,
+    var(--hatch) 3px,
+    var(--hatch) 4px
+  );
+}
+
+/* Status pills/dots */
+.sk-dot {
+  display: inline-block;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+  border: 1px solid var(--ink);
+}
+.sk-dot.red { background: var(--status-red); }
+.sk-dot.yellow { background: var(--status-yellow); }
+.sk-dot.green { background: var(--status-green); }
+.sk-dot.grey { background: var(--status-grey); }
+.sk-dot.blue { background: var(--status-blue); }
+
+.sk-dot.pulse.yellow {
+  animation: sk-pulse 1.4s ease-in-out infinite;
+}
+@keyframes sk-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220,168,56,0.6); }
+  50% { box-shadow: 0 0 0 5px rgba(220,168,56,0); }
+}
+
+/* Status bar (left-edge of cards) */
+.sk-bar {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--ink-faint);
+}
+.sk-bar.red { background: var(--status-red); }
+.sk-bar.yellow { background: var(--status-yellow); }
+.sk-bar.green { background: var(--status-green); }
+.sk-bar.grey { background: var(--status-grey); }
+
+/* mono labels */
+.sk-mono {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+}
+.sk-mono.tiny { font-size: 9px; }
+.sk-mono.big { font-size: 12px; }
+
+/* clear UI text — used for primary headings and run names */
+.sk-hand {
+  font-family: var(--ui);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+}
+
+
+
+/* underline scribble */
+.sk-scribble-u {
+  position: relative;
+  display: inline-block;
+}
+.sk-scribble-u::after {
+  content: "";
+  position: absolute;
+  left: -2px; right: -2px; bottom: -3px;
+  height: 4px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 4' preserveAspectRatio='none'%3E%3Cpath d='M0 2 Q 7 0 15 2 T 30 2 T 45 2 T 60 2' fill='none' stroke='%231a1a1a' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+}
+
+/* button — clean console */
+.sk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border: 1px solid rgba(26,26,26,0.18);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: none;
+  position: relative;
+  letter-spacing: 0.005em;
+}
+.sk-btn:hover { background: var(--paper-2); border-color: rgba(26,26,26,0.32); }
+.sk-btn:active { background: var(--paper-3); }
+.sk-btn.small { font-size: 11px; padding: 3px 8px; }
+.sk-btn.ghost { background: transparent; border-color: transparent; color: var(--ink-soft); }
+.sk-btn.ghost:hover { background: var(--paper-2); border-color: rgba(26,26,26,0.18); color: var(--ink); }
+.sk-btn.danger { background: var(--paper); border-color: rgba(212,68,68,0.45); color: var(--status-red); }
+.sk-btn.danger:hover { background: var(--status-red-soft); border-color: var(--status-red); }
+.sk-btn.go { background: var(--paper); border-color: rgba(58,170,136,0.45); color: var(--status-green); }
+.sk-btn.command {
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+}
+
+/* divider — wavy hand-drawn */
+.sk-div {
+  height: 6px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 6' preserveAspectRatio='none'%3E%3Cpath d='M0 3 Q 10 0 20 3 T 40 3 T 60 3 T 80 3' fill='none' stroke='%231a1a1a' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-size: 80px 6px;
+  background-repeat: repeat-x;
+}
+
+/* grid overlay — naval */
+.sk-grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(26,26,26,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(26,26,26,0.04) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* arrow / caret */
+.sk-arrow {
+  display: inline-block;
+  width: 0; height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 6px solid var(--ink);
+}
+
+/* Dotted leader text (for naval coords) */
+.sk-coord {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-soft);
+}
+
+
+
+/* Zebra stripe table rows */
+.sk-zebra > *:nth-child(even) { background: var(--paper-2); }
+
+/* Reduce default scrollbars inside artboards */
+.sk-wire ::-webkit-scrollbar { display: none; }
+.sk-wire * { scrollbar-width: none; }

@@ -7,6 +7,9 @@ export const queryKeys = {
       ['runs', 'list', { page, limit, filters }] as const,
     detail: (runId: string) => ['runs', 'detail', runId] as const,
     nodes: (runId: string) => ['runs', 'nodes', runId] as const,
+    nodeDetail: (runId: string, nodeName: string) =>
+      ['runs', 'nodeDetail', runId, nodeName] as const,
+    nodeLogs: (runId: string, nodeName: string) => ['runs', 'nodeLogs', runId, nodeName] as const,
   },
 };
 
