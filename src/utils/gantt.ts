@@ -27,25 +27,32 @@ export function buildGanttModel(
   pipelineCreatedAtIso: string,
   pipelineCompletedAtIso: string | null,
   nowMs: number,
+  runTerminated = false,
 ): GanttModel {
   const t0 = parseIso(pipelineCreatedAtIso) ?? nowMs;
   const pipelineEnd = parseIso(pipelineCompletedAtIso);
+  const terminationMs = runTerminated && pipelineEnd !== null ? pipelineEnd : null;
 
   const rows: GanttRow[] = nodes.map((node) => {
-    const state = getNodeState(node);
+    const state = getNodeState(node, runTerminated);
     const isPending = state === 'pending';
     const created = parseIso(node.created_at) ?? t0;
     const started = parseIso(node.started_at);
     const completed = parseIso(node.completed_at);
 
     const waitStartMs = Math.max(0, created - t0);
-    const waitEndMs = started !== null ? Math.max(waitStartMs, started - t0) : waitStartMs;
+    const waitEndMs =
+      started !== null
+        ? Math.max(waitStartMs, started - t0)
+        : terminationMs !== null
+          ? Math.max(waitStartMs, terminationMs - t0)
+          : waitStartMs;
     const runStartMs = waitEndMs;
     const runEndMs =
       completed !== null
         ? Math.max(runStartMs, completed - t0)
         : started !== null
-          ? Math.max(runStartMs, nowMs - t0)
+          ? Math.max(runStartMs, (terminationMs ?? nowMs) - t0)
           : runStartMs;
 
     return {

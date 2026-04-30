@@ -4,7 +4,7 @@ import { getRun } from '@/services/runs';
 import type { Run } from '@/types/api';
 import { getRunState } from '@/utils/runStatus';
 
-const RUNNING_INTERVAL = 10_000;
+const RUNNING_INTERVAL = 5_000;
 const SETTLED_INTERVAL = 60_000;
 
 export function useRun(runId: string | null) {

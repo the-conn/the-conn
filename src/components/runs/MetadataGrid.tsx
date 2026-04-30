@@ -1,4 +1,5 @@
 import { ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 import { TriggerChip } from '@/components/ui/TriggerChip';
 import type { Run } from '@/types/api';
 import { getGitTriggerUrl } from '@/utils/gitUrl';
@@ -27,9 +28,12 @@ export function MetadataGrid({ run }: MetadataGridProps) {
       <Cell label="sha" mono value={shortSha(run.sha)} />
       {run.retry_of ? (
         <Cell label="retry of">
-          <span className="font-mono text-[12px] font-semibold text-trigger-retry underline">
+          <Link
+            href={`/runs/${run.retry_of}`}
+            className="font-mono text-[12px] font-semibold text-trigger-retry underline hover:opacity-80"
+          >
             ↪ {run.retry_of.slice(0, 8)}
-          </span>
+          </Link>
         </Cell>
       ) : (
         <Cell label="pipeline" mono value={run.pipeline_name} />

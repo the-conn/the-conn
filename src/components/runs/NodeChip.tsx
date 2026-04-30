@@ -7,10 +7,11 @@ import { formatDurationSeconds, parseIso } from '@/utils/time';
 interface NodeChipProps {
   node: NodeExecution;
   pipelineCompletedAt: string | null;
+  runTerminated: boolean;
 }
 
-export function NodeChip({ node, pipelineCompletedAt }: NodeChipProps) {
-  const state = getNodeState(node);
+export function NodeChip({ node, pipelineCompletedAt, runTerminated }: NodeChipProps) {
+  const state = getNodeState(node, runTerminated);
   const spec = NODE_SPEC[state];
 
   const created = parseIso(node.created_at);

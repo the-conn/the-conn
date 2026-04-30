@@ -1,5 +1,7 @@
 export type RunTrigger = 'pull_request' | 'push' | 'tag' | 'manual' | string;
 
+export type RunStatus = 'in_progress' | 'success' | 'failure' | 'cancelled';
+
 export interface Run {
   run_id: string;
   pipeline_name: string;
@@ -12,8 +14,7 @@ export interface Run {
   pr_number: number | null;
   trigger: RunTrigger;
   pipeline_definition: string;
-  success: boolean | null;
-  cancelled: boolean;
+  status: RunStatus;
   created_at: string;
   completed_at: string | null;
   retry_of: string | null;
@@ -37,7 +38,7 @@ export type RunFilters = Partial<Record<RunFilterField, string>>;
 export interface RunListParams {
   limit: number;
   offset: number;
-  sort_by?: 'created_at' | 'completed_at' | 'pipeline_name' | 'owner' | 'success';
+  sort_by?: 'created_at' | 'completed_at' | 'pipeline_name' | 'owner' | 'status';
   order?: 'asc' | 'desc';
   filters?: RunFilters;
 }
