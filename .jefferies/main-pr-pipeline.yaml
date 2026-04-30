@@ -10,6 +10,7 @@ nodes:
     image: node:22-bookworm-slim
     checkout: true
     steps:
+      - apt-get update && apt-get install -y ca-certificates
       - npm run format:check
       - npm run typecheck
       - npm run lint
