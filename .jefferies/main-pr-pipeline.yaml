@@ -9,6 +9,8 @@ nodes:
   - name: Lint and Format
     image: node:22-bookworm-slim
     checkout: true
+    env:
+      npm_config_cache: /tmp
     steps:
       - npm install
       - npm run format:check
