@@ -7,7 +7,7 @@ on:
 
 nodes:
   - name: Lint and Format
-    image: node:22-bookworm-slim
+    image: node:24-bookworm-slim
     checkout: true
     env:
       npm_config_cache: /tmp

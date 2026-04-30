@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { HandHeader } from '@/components/ui/HandHeader';
 import { NodeChip } from '@/components/runs/NodeChip';
 import type { NodeExecution } from '@/types/api';
@@ -9,6 +12,15 @@ interface NodeGridProps {
 }
 
 export function NodeGrid({ nodes, pipelineCompletedAt, runTerminated }: NodeGridProps) {
+  const [now, setNow] = useState(() => Date.now());
+  const isTicking = !runTerminated && pipelineCompletedAt === null;
+
+  useEffect(() => {
+    if (!isTicking) return;
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, [isTicking]);
+
   return (
     <section className="flex flex-col gap-[8px]">
       <HandHeader>Nodes</HandHeader>
@@ -22,6 +34,7 @@ export function NodeGrid({ nodes, pipelineCompletedAt, runTerminated }: NodeGrid
               node={node}
               pipelineCompletedAt={pipelineCompletedAt}
               runTerminated={runTerminated}
+              nowMs={now}
             />
           ))}
         </div>

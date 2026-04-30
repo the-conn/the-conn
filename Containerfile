@@ -1,9 +1,9 @@
-FROM docker.io/node:22-bookworm-slim AS deps
+FROM docker.io/node:24-bookworm-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-FROM docker.io/node:22-bookworm-slim AS builder
+FROM docker.io/node:24-bookworm-slim AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -13,7 +13,7 @@ ENV NEXT_PUBLIC_GIT_BASE_URL=__APP_GIT_BASE_URL__
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-FROM docker.io/node:22-bookworm-slim AS runner
+FROM docker.io/node:24-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1

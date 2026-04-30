@@ -70,7 +70,7 @@ function buildMessage(state: ReturnType<typeof getRunState>, nodes: NodeExecutio
 }
 
 function useElapsed(run: Run): string {
-  const t0 = parseIso(run.created_at) ?? Date.now();
+  const created = parseIso(run.created_at);
   const completed = parseIso(run.completed_at);
   const [now, setNow] = useState(() => Date.now());
   const isFinished = completed !== null;
@@ -81,6 +81,7 @@ function useElapsed(run: Run): string {
     return () => window.clearInterval(id);
   }, [isFinished]);
 
+  if (created === null) return formatElapsedHms(0);
   const end = completed ?? now;
-  return formatElapsedHms(end - t0);
+  return formatElapsedHms(end - created);
 }

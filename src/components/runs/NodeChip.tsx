@@ -8,16 +8,17 @@ interface NodeChipProps {
   node: NodeExecution;
   pipelineCompletedAt: string | null;
   runTerminated: boolean;
+  nowMs: number;
 }
 
-export function NodeChip({ node, pipelineCompletedAt, runTerminated }: NodeChipProps) {
+export function NodeChip({ node, pipelineCompletedAt, runTerminated, nowMs }: NodeChipProps) {
   const state = getNodeState(node, runTerminated);
   const spec = NODE_SPEC[state];
 
   const created = parseIso(node.created_at);
   const started = parseIso(node.started_at);
   const completed = parseIso(node.completed_at);
-  const settled = completed ?? parseIso(pipelineCompletedAt) ?? Date.now();
+  const settled = completed ?? parseIso(pipelineCompletedAt) ?? nowMs;
 
   const waitedSec = started !== null && created !== null ? (started - created) / 1000 : 0;
   const ranSec =
