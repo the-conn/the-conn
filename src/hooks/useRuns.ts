@@ -28,7 +28,7 @@ export function useRuns(page: number, filters: RunFilters = EMPTY_FILTERS): UseR
         order: 'desc',
         filters,
       }),
-    refetchInterval: 30_000,
+    refetchInterval: 5_000,
     refetchIntervalInBackground: false,
     placeholderData: keepPreviousData,
   });
