@@ -34,7 +34,7 @@ export function Sidebar({ activeRunId }: SidebarProps) {
     }
   }, [filterSignature]);
 
-  const { runs, isLoading, error, hasMore, limit } = useRuns(page, filters);
+  const { runs, isLoading, error, hasMore, total, totalPages } = useRuns(page, filters);
   const filterCount = activeFilterEntries(filters).length;
 
   return (
@@ -42,7 +42,7 @@ export function Sidebar({ activeRunId }: SidebarProps) {
       <div className="flex items-baseline gap-2">
         <HandHeader>Pipeline Runs</HandHeader>
         <span className="ml-auto font-mono text-[9px] text-ink-faint">
-          {runs.length} this page
+          {runs.length} of {total}
           {filterCount > 0 ? ` · ${filterCount} filter${filterCount === 1 ? '' : 's'}` : ''}
         </span>
       </div>
@@ -80,7 +80,7 @@ export function Sidebar({ activeRunId }: SidebarProps) {
         </Button>
         <span className="flex items-center gap-1">
           page <span className="font-semibold text-ink">{page + 1}</span>
-          <span className="text-ink-faint">· {limit}/page</span>
+          <span>/ {totalPages}</span>
         </span>
         <Button variant="ghost" size="sm" onClick={() => setPage((p) => p + 1)} disabled={!hasMore}>
           next

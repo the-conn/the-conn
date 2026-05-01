@@ -12,6 +12,8 @@ export interface UseRunsResult {
   hasMore: boolean;
   page: number;
   limit: number;
+  total: number;
+  totalPages: number;
 }
 
 const EMPTY_FILTERS: RunFilters = {};
@@ -32,14 +34,18 @@ export function useRuns(page: number, filters: RunFilters = EMPTY_FILTERS): UseR
     refetchIntervalInBackground: false,
     placeholderData: keepPreviousData,
   });
-  const runs = query.data ?? [];
+  const runs = query.data?.runs ?? [];
+  const total = query.data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
   return {
     runs,
     isLoading: query.isLoading,
     isFetching: query.isFetching,
     error: query.error as Error | null,
-    hasMore: runs.length === limit,
+    hasMore: page + 1 < totalPages,
     page,
     limit,
+    total,
+    totalPages,
   };
 }

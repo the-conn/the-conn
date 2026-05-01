@@ -1,9 +1,15 @@
 import { fetchJson, fetchText } from '@/services/apiClient';
-import type { NodeExecution, Run, RunFilterField, RunListParams } from '@/types/api';
+import type {
+  NodeExecution,
+  Run,
+  RunFilterField,
+  RunListParams,
+  RunListResponse,
+} from '@/types/api';
 
 const FILTER_FIELDS: RunFilterField[] = ['pipeline_name', 'owner', 'repo'];
 
-export function listRuns(params: RunListParams): Promise<Run[]> {
+export function listRuns(params: RunListParams): Promise<RunListResponse> {
   const search = new URLSearchParams({
     limit: String(params.limit),
     offset: String(params.offset),
@@ -16,7 +22,7 @@ export function listRuns(params: RunListParams): Promise<Run[]> {
       if (value && value.length > 0) search.set(field, value);
     }
   }
-  return fetchJson<Run[]>(`/api/v1/runs?${search.toString()}`);
+  return fetchJson<RunListResponse>(`/api/v1/runs?${search.toString()}`);
 }
 
 export function getRun(runId: string): Promise<Run> {

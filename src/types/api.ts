@@ -55,3 +55,8 @@ export interface RunListParams {
   order?: 'asc' | 'desc';
   filters?: RunFilters;
 }
+
+export interface RunListResponse {
+  runs: Run[];
+  total: number;
+}
