@@ -3,17 +3,16 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { TopNav } from '@/components/layout/TopNav';
 
 interface AppShellProps {
-  activeRunId: string | null;
   children: ReactNode;
 }
 
-export function AppShell({ activeRunId, children }: AppShellProps) {
+export function AppShell({ children }: AppShellProps) {
   return (
     <div className="flex flex-col h-dvh bg-paper text-ink">
       <TopNav />
       <div className="flex flex-1 min-h-0">
         <Suspense fallback={<SidebarFallback />}>
-          <Sidebar activeRunId={activeRunId} />
+          <Sidebar />
         </Suspense>
         <main className="flex-1 min-w-0 px-6 py-4 flex flex-col gap-[14px] overflow-auto">
           {children}

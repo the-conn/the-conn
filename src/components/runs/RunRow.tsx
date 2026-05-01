@@ -1,8 +1,12 @@
+'use client';
+
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Mono } from '@/components/ui/Mono';
 import { StatusGlyph } from '@/components/ui/StatusGlyph';
 import { TriggerChip } from '@/components/ui/TriggerChip';
 import type { Run } from '@/types/api';
+import { withSearchParams } from '@/utils/href';
 import { NODE_SPEC, getRunState } from '@/utils/runStatus';
 import { formatRelative, shortSha } from '@/utils/time';
 
@@ -12,14 +16,16 @@ interface RunRowProps {
 }
 
 export function RunRow({ run, isActive }: RunRowProps) {
+  const searchParams = useSearchParams();
   const state = getRunState(run);
   const spec = NODE_SPEC[state];
   const recency = formatRelative(run.created_at);
   const repoTail = run.repo;
+  const href = withSearchParams(`/runs/${run.run_id}`, searchParams);
 
   return (
     <Link
-      href={`/runs/${run.run_id}`}
+      href={href}
       className={`relative block rounded-[3px] border bg-paper px-[12px] pl-[14px] py-[7px] transition-colors hover:bg-paper-2 ${
         isActive ? 'border-[1.5px] border-ink/85 bg-paper-2' : 'border border-ink/85'
       }`}

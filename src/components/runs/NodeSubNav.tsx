@@ -1,9 +1,13 @@
+'use client';
+
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Mono } from '@/components/ui/Mono';
 import { StatusGlyph } from '@/components/ui/StatusGlyph';
 import { StatusPill } from '@/components/ui/StatusPill';
 import type { NodeExecution } from '@/types/api';
 import type { NodeState } from '@/types/ui';
+import { withSearchParams } from '@/utils/href';
 
 interface NodeSubNavProps {
   runId: string;
@@ -12,10 +16,12 @@ interface NodeSubNavProps {
 }
 
 export function NodeSubNav({ runId, node, state }: NodeSubNavProps) {
+  const searchParams = useSearchParams();
+  const backHref = withSearchParams(`/runs/${encodeURIComponent(runId)}`, searchParams);
   return (
     <div className="flex items-center gap-3 px-[18px] py-[8px] border-b border-ink-trace bg-paper-2">
       <Link
-        href={`/runs/${encodeURIComponent(runId)}`}
+        href={backHref}
         className="inline-flex items-center gap-[4px] px-[6px] py-[2px] rounded-[4px] font-mono text-[11px] text-ink-soft hover:bg-paper-3 hover:text-ink"
       >
         ← run {runId.slice(0, 8)}

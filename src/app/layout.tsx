@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
+import { AppShell } from '@/components/layout/AppShell';
 import { Providers } from '@/app/providers';
 import './globals.css';
 
@@ -24,7 +25,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${mono.variable}`}>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <AppShell>{children}</AppShell>
+        </Providers>
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FilterBar } from '@/components/layout/FilterBar';
 import { HandHeader } from '@/components/ui/HandHeader';
@@ -10,11 +10,14 @@ import { RunRow } from '@/components/runs/RunRow';
 import { useRuns } from '@/hooks/useRuns';
 import { activeFilterEntries, readFiltersFromSearchParams } from '@/utils/runFilters';
 
-interface SidebarProps {
-  activeRunId: string | null;
-}
+const RUN_PATH_RE = /^\/runs\/([^/]+)/;
 
-export function Sidebar({ activeRunId }: SidebarProps) {
+export function Sidebar() {
+  const pathname = usePathname();
+  const activeRunId = useMemo(() => {
+    const match = pathname?.match(RUN_PATH_RE);
+    return match && match[1] ? decodeURIComponent(match[1]) : null;
+  }, [pathname]);
   const searchParams = useSearchParams();
   const filters = useMemo(() => readFiltersFromSearchParams(searchParams), [searchParams]);
   const filterSignature = useMemo(
