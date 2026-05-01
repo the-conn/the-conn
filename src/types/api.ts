@@ -31,6 +31,25 @@ export interface NodeExecution {
   completed_at: string | null;
 }
 
+export interface BuildConfig {
+  containerfile: string;
+  tags: string[];
+  build_args: string[];
+}
+
+export type NodeKind = 'exec' | { build: BuildConfig };
+
+export interface NodeDefinition {
+  name: string;
+  image: string;
+  steps: string[];
+  dependencies: string[];
+  timeout_secs: number | null;
+  checkout: boolean;
+  env: Record<string, string>;
+  kind: NodeKind;
+}
+
 export type LogStream = 'stdout' | 'stderr';
 
 export interface LogLine {

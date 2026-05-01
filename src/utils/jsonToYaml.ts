@@ -1,4 +1,10 @@
-type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
 
 const RESERVED_RE = /^(true|false|null|yes|no|on|off|~)$/i;
 const NUMERIC_RE = /^-?\d+(\.\d+)?([eE][-+]?\d+)?$/;
@@ -74,6 +80,12 @@ function dumpArray(arr: JsonValue[], indent: number): string[] {
   return out;
 }
 
+export function valueToYaml(value: JsonValue): string {
+  if (value === null || typeof value !== 'object') return scalar(value);
+  if (Array.isArray(value)) return dumpArray(value, 0).join('\n');
+  return dumpObject(value, 0).join('\n');
+}
+
 export function jsonToYaml(input: string): string {
   if (!input) return '';
   let parsed: JsonValue;
@@ -82,7 +94,5 @@ export function jsonToYaml(input: string): string {
   } catch {
     return input;
   }
-  if (parsed === null || typeof parsed !== 'object') return scalar(parsed);
-  if (Array.isArray(parsed)) return dumpArray(parsed, 0).join('\n');
-  return dumpObject(parsed, 0).join('\n');
+  return valueToYaml(parsed);
 }
