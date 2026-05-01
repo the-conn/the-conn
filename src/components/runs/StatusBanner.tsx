@@ -66,7 +66,7 @@ function buildMessage(state: ReturnType<typeof getRunState>, nodes: NodeExecutio
     return firstFail ? `failed in node "${firstFail.node_name}"` : 'pipeline failed';
   }
   if (state === 'pass') return `${passed} of ${total} nodes succeeded`;
-  return `${total} nodes decommissioned`;
+  return `${total} node${total === 1 ? '' : 's'} decommissioned`;
 }
 
 function useElapsed(run: Run): string {
