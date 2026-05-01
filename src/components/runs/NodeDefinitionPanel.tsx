@@ -1,6 +1,6 @@
 import { Fragment, useMemo } from 'react';
 import { HandHeader } from '@/components/ui/HandHeader';
-import { nodeDefinitionToYaml } from '@/utils/nodeDefinition';
+import { jsonToYaml } from '@/utils/jsonToYaml';
 
 interface NodeDefinitionPanelProps {
   definition: string;
@@ -10,7 +10,7 @@ const KEY_PATTERN = /^(\s*-?\s*)([A-Za-z0-9_.-]+)(:)(\s*)(.*)$/;
 const ITEM_PATTERN = /^(\s*)(- )(.*)$/;
 
 export function NodeDefinitionPanel({ definition }: NodeDefinitionPanelProps) {
-  const yaml = useMemo(() => nodeDefinitionToYaml(definition), [definition]);
+  const yaml = useMemo(() => jsonToYaml(definition), [definition]);
   return (
     <div className="flex flex-col gap-[6px]">
       <div className="flex items-center justify-between">
