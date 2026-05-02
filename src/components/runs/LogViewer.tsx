@@ -1,8 +1,8 @@
 'use client';
 
 import { styled } from '@linaria/react';
-import { useCallback, useMemo, useState } from 'react';
-import { Virtuoso } from 'react-virtuoso';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import { HandHeader } from '@/components/ui/HandHeader';
 import { SearchBox } from '@/components/ui/SearchBox';
 import { StreamFilter, type StreamFilterValue } from '@/components/ui/StreamFilter';
@@ -114,6 +114,8 @@ export function LogViewer({ raw, lines, loading, error, downloadName }: LogViewe
   const [stream, setStream] = useState<StreamFilterValue>('all');
   const [query, setQuery] = useState('');
   const [wrap, setWrap] = useState(false);
+  const [tail, setTail] = useState(false);
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
 
   const counts = useMemo(
     () => ({
@@ -141,6 +143,16 @@ export function LogViewer({ raw, lines, loading, error, downloadName }: LogViewe
     }
     return min;
   }, [lines]);
+
+  const handleTailToggle = useCallback(() => {
+    setTail((prev) => {
+      const next = !prev;
+      if (next) {
+        virtuosoRef.current?.scrollToIndex({ index: 'LAST', behavior: 'auto' });
+      }
+      return next;
+    });
+  }, []);
 
   const handleDownload = useCallback(() => {
     if (!raw) return;
@@ -170,6 +182,14 @@ export function LogViewer({ raw, lines, loading, error, downloadName }: LogViewe
         >
           ↵ wrap
         </ToolbarBtn>
+        <ToolbarBtn
+          type="button"
+          title="Follow new log lines"
+          data-active={tail}
+          onClick={handleTailToggle}
+        >
+          ↡ tail
+        </ToolbarBtn>
         <ToolbarBtn type="button" title="Download logs" onClick={handleDownload} disabled={!raw}>
           ⤓ download
         </ToolbarBtn>
@@ -188,8 +208,13 @@ export function LogViewer({ raw, lines, loading, error, downloadName }: LogViewe
           </div>
         ) : (
           <Virtuoso
+            ref={virtuosoRef}
             style={{ height: '100%' }}
             data={filtered}
+            followOutput={tail ? 'auto' : false}
+            atBottomStateChange={(atBottom) => {
+              if (tail && !atBottom) setTail(false);
+            }}
             itemContent={(index, line) => {
               const isErr = line.stream === 'stderr';
               const elapsed = line.ts && base ? (line.ts - base) / 1000 : 0;
