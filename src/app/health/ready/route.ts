@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   try {
-    const upstream = await fetch(`${base}/health/ready`, {
+    const upstream = await fetch(`${base}/api/health/ready`, {
       headers: { Accept: 'application/json' },
       cache: 'no-store',
     });
