@@ -9,10 +9,19 @@ nodes:
   - name: Lint and Format
     image: node:24-bookworm-slim
     checkout: true
-    env:
-      npm_config_cache: /tmp
+    volumes:
+      npm: /.npm
     steps:
       - npm install
       - npm run format:check
       - npm run typecheck
       - npm run lint
+
+  - name: Build Image
+    image: quay.io/buildah/stable:latest
+    privileged: true
+    checkout: true
+    env:
+      STORAGE_DRIVER: vfs
+    steps:
+      - buildah bud -f Containerfile -t quay.io/the-conn/the-conn .

@@ -11,21 +11,22 @@ import { useRun } from '@/hooks/useRun';
 import { getNodeState, getRunState } from '@/utils/runStatus';
 
 interface NodeViewDeckProps {
+  slug: string;
   runId: string;
   nodeName: string;
 }
 
-export function NodeViewDeck({ runId, nodeName }: NodeViewDeckProps) {
-  const runQuery = useRun(runId);
+export function NodeViewDeck({ slug, runId, nodeName }: NodeViewDeckProps) {
+  const runQuery = useRun(slug, runId);
   const runIsRunning = runQuery.data ? getRunState(runQuery.data) === 'running' : false;
-  const nodeQuery = useNodeDetail(runId, nodeName, runIsRunning);
+  const nodeQuery = useNodeDetail(slug, runId, nodeName, runIsRunning);
 
   const node = nodeQuery.data;
   const runTerminated = runQuery.data ? runQuery.data.status !== 'in_progress' : false;
   const state = node ? getNodeState(node, runTerminated) : 'pending';
   const nodeIsRunning = state === 'running' || state === 'pending';
 
-  const logsQuery = useNodeLogs(runId, nodeName, runIsRunning && nodeIsRunning);
+  const logsQuery = useNodeLogs(slug, runId, nodeName, runIsRunning && nodeIsRunning);
 
   if (nodeQuery.isLoading || runQuery.isLoading) {
     return (
@@ -46,7 +47,7 @@ export function NodeViewDeck({ runId, nodeName }: NodeViewDeckProps) {
 
   return (
     <Wrapper>
-      <NodeSubNav runId={runId} node={node} state={state} />
+      <NodeSubNav slug={slug} runId={runId} node={node} state={state} />
       <div className="flex flex-1 min-h-0">
         <NodeTimingSidebar node={node} state={state} />
         <LogViewer

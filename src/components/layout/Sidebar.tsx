@@ -4,15 +4,35 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FilterBar } from '@/components/layout/FilterBar';
+import { TenantSwitcher } from '@/components/layout/TenantSwitcher';
 import { HandHeader } from '@/components/ui/HandHeader';
 import { Button } from '@/components/ui/Button';
 import { RunRow } from '@/components/runs/RunRow';
+import { useSession } from '@/contexts/SessionContext';
+import { useOptionalTenantSlug } from '@/hooks/useTenantSlug';
 import { useRuns } from '@/hooks/useRuns';
 import { activeFilterEntries, readFiltersFromSearchParams } from '@/utils/runFilters';
 
-const RUN_PATH_RE = /^\/runs\/([^/]+)/;
+const RUN_PATH_RE = /^\/[^/]+\/runs\/([^/]+)/;
 
 export function Sidebar() {
+  const routeSlug = useOptionalTenantSlug();
+  const { activeSlug } = useSession();
+  const slug = routeSlug ?? activeSlug;
+
+  return (
+    <aside className="w-[296px] shrink-0 border-r-[1.2px] border-ink/85 bg-paper flex flex-col gap-[10px] px-3 py-[14px] min-h-0">
+      <TenantSwitcher activeSlug={slug} />
+      {slug ? <SidebarRunList slug={slug} /> : <SidebarIdle />}
+    </aside>
+  );
+}
+
+interface SidebarRunListProps {
+  slug: string;
+}
+
+function SidebarRunList({ slug }: SidebarRunListProps) {
   const pathname = usePathname();
   const activeRunId = useMemo(() => {
     const match = pathname?.match(RUN_PATH_RE);
@@ -37,11 +57,11 @@ export function Sidebar() {
     }
   }, [filterSignature]);
 
-  const { runs, isLoading, error, hasMore, total, totalPages } = useRuns(page, filters);
+  const { runs, isLoading, error, hasMore, total, totalPages } = useRuns(slug, page, filters);
   const filterCount = activeFilterEntries(filters).length;
 
   return (
-    <aside className="w-[296px] shrink-0 border-r-[1.2px] border-ink/85 bg-paper flex flex-col gap-[10px] px-3 py-[14px] min-h-0">
+    <>
       <div className="flex items-baseline gap-2">
         <HandHeader>Pipeline Runs</HandHeader>
         <span className="ml-auto font-mono text-[9px] text-ink-faint">
@@ -66,7 +86,7 @@ export function Sidebar() {
             </div>
           )}
           {runs.map((run) => (
-            <RunRow key={run.run_id} run={run} isActive={run.run_id === activeRunId} />
+            <RunRow key={run.run_id} slug={slug} run={run} isActive={run.run_id === activeRunId} />
           ))}
         </div>
       </div>
@@ -90,7 +110,20 @@ export function Sidebar() {
           <ChevronRight size={11} strokeWidth={2} />
         </Button>
       </div>
-    </aside>
+    </>
+  );
+}
+
+function SidebarIdle() {
+  return (
+    <>
+      <div className="flex items-baseline gap-2">
+        <HandHeader>Pipeline Runs</HandHeader>
+      </div>
+      <div className="flex-1 font-mono text-[10px] text-ink-faint px-1 py-2">
+        select a tenant to load runs
+      </div>
+    </>
   );
 }
 

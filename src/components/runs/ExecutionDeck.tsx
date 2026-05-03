@@ -12,13 +12,14 @@ import { HandHeader } from '@/components/ui/HandHeader';
 import { getRunState } from '@/utils/runStatus';
 
 interface ExecutionDeckProps {
+  slug: string;
   runId: string;
 }
 
-export function ExecutionDeck({ runId }: ExecutionDeckProps) {
-  const runQuery = useRun(runId);
+export function ExecutionDeck({ slug, runId }: ExecutionDeckProps) {
+  const runQuery = useRun(slug, runId);
   const isRunning = runQuery.data ? getRunState(runQuery.data) === 'running' : false;
-  const nodesQuery = useRunNodes(runId, isRunning);
+  const nodesQuery = useRunNodes(slug, runId, isRunning);
 
   if (runQuery.isLoading) {
     return <DeckMessage label="loading run telemetry…" />;
@@ -34,19 +35,21 @@ export function ExecutionDeck({ runId }: ExecutionDeckProps) {
   return (
     <>
       <StatusBanner run={run} nodes={nodes} />
-      <MetadataGrid run={run} />
+      <MetadataGrid slug={slug} run={run} />
       {nodesQuery.error && (
         <div className="font-mono text-[10px] text-rose-conn">
           failed to load nodes: {nodesQuery.error.message}
         </div>
       )}
       <GanttTimeline
+        slug={slug}
         runId={runId}
         run={run}
         nodes={nodes}
-        actions={<ExecutionActions run={run} />}
+        actions={<ExecutionActions slug={slug} run={run} />}
       />
       <NodeGrid
+        slug={slug}
         runId={runId}
         nodes={nodes}
         pipelineCompletedAt={run.completed_at}

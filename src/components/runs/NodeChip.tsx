@@ -10,6 +10,7 @@ import { NODE_SPEC, getNodeState } from '@/utils/runStatus';
 import { formatDurationSeconds, parseIso } from '@/utils/time';
 
 interface NodeChipProps {
+  slug: string;
   runId: string;
   node: NodeExecution;
   pipelineCompletedAt: string | null;
@@ -18,6 +19,7 @@ interface NodeChipProps {
 }
 
 export function NodeChip({
+  slug,
   runId,
   node,
   pipelineCompletedAt,
@@ -42,7 +44,7 @@ export function NodeChip({
       : 0;
 
   const href = withSearchParams(
-    `/runs/${encodeURIComponent(runId)}/nodes/${encodeURIComponent(node.node_name)}`,
+    `/${encodeURIComponent(slug)}/runs/${encodeURIComponent(runId)}/nodes/${encodeURIComponent(node.node_name)}`,
     searchParams,
   );
 

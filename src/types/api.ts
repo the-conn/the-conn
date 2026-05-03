@@ -63,14 +63,14 @@ export interface NodeLogsPayload {
   lines: LogLine[];
 }
 
-export type RunFilterField = 'pipeline_name' | 'owner' | 'repo';
+export type RunFilterField = 'pipeline_name' | 'repo' | 'sha';
 
 export type RunFilters = Partial<Record<RunFilterField, string>>;
 
 export interface RunListParams {
   limit: number;
   offset: number;
-  sort_by?: 'created_at' | 'completed_at' | 'pipeline_name' | 'owner' | 'status';
+  sort_by?: 'created_at' | 'completed_at' | 'pipeline_name' | 'status';
   order?: 'asc' | 'desc';
   filters?: RunFilters;
 }

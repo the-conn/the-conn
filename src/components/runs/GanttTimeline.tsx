@@ -12,6 +12,7 @@ import { buildGanttModel, pct } from '@/utils/gantt';
 import { formatDurationSeconds, formatTickOffset, parseIso } from '@/utils/time';
 
 interface GanttTimelineProps {
+  slug: string;
   runId: string;
   run: Run;
   nodes: NodeExecution[];
@@ -49,7 +50,7 @@ const RunSeg = styled.div<{ color: string; soft: string }>`
   overflow: hidden;
 `;
 
-export function GanttTimeline({ runId, run, nodes, actions }: GanttTimelineProps) {
+export function GanttTimeline({ slug, runId, run, nodes, actions }: GanttTimelineProps) {
   const isRunning = getRunState(run) === 'running';
   const [now, setNow] = useState(() => Date.now());
 
@@ -129,7 +130,7 @@ export function GanttTimeline({ runId, run, nodes, actions }: GanttTimelineProps
           return (
             <Link
               key={row.node.id}
-              href={`/runs/${encodeURIComponent(runId)}/nodes/${encodeURIComponent(row.node.node_name)}`}
+              href={`/${encodeURIComponent(slug)}/runs/${encodeURIComponent(runId)}/nodes/${encodeURIComponent(row.node.node_name)}`}
               className="relative flex items-center rounded-[2px] hover:bg-paper-2 cursor-pointer"
               style={{ height: ROW_H }}
               title={`view ${row.node.node_name}`}

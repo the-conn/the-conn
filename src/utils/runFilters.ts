@@ -1,11 +1,11 @@
 import type { RunFilterField, RunFilters } from '@/types/api';
 
-export const FILTER_FIELDS: readonly RunFilterField[] = ['pipeline_name', 'owner', 'repo'] as const;
+export const FILTER_FIELDS: readonly RunFilterField[] = ['pipeline_name', 'repo', 'sha'] as const;
 
 export const FILTER_LABELS: Record<RunFilterField, string> = {
   pipeline_name: 'pipeline',
-  owner: 'owner',
   repo: 'repo',
+  sha: 'sha',
 };
 
 export function readFiltersFromSearchParams(

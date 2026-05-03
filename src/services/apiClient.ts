@@ -13,12 +13,34 @@ export class ApiError extends Error {
   }
 }
 
+export class UnauthorizedError extends ApiError {
+  constructor(body: string, message: string) {
+    super(401, body, message);
+    this.name = 'UnauthorizedError';
+  }
+}
+
+export class ForbiddenError extends ApiError {
+  constructor(body: string, message: string) {
+    super(403, body, message);
+    this.name = 'ForbiddenError';
+  }
+}
+
+function makeError(status: number, body: string, path: string, statusText: string): ApiError {
+  const message = `${status} ${statusText} for ${path}`;
+  if (status === 401) return new UnauthorizedError(body, message);
+  if (status === 403) return new ForbiddenError(body, message);
+  return new ApiError(status, body, message);
+}
+
 export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   if (!API_BASE) {
     throw new ApiError(0, '', 'NEXT_PUBLIC_API_BASE_URL is not configured');
   }
   const url = `${API_BASE}${path}`;
   const response = await fetch(url, {
+    credentials: 'include',
     ...init,
     headers: {
       Accept: 'application/json',
@@ -27,11 +49,7 @@ export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T>
   });
   if (!response.ok) {
     const body = await response.text().catch(() => '');
-    throw new ApiError(
-      response.status,
-      body,
-      `${response.status} ${response.statusText} for ${path}`,
-    );
+    throw makeError(response.status, body, path, response.statusText);
   }
   if (response.status === 204 || response.headers.get('content-length') === '0') {
     return undefined as T;
@@ -45,6 +63,7 @@ export async function fetchText(path: string, init?: RequestInit): Promise<strin
   }
   const url = `${API_BASE}${path}`;
   const response = await fetch(url, {
+    credentials: 'include',
     ...init,
     headers: {
       Accept: 'text/plain',
@@ -53,11 +72,7 @@ export async function fetchText(path: string, init?: RequestInit): Promise<strin
   });
   if (!response.ok) {
     const body = await response.text().catch(() => '');
-    throw new ApiError(
-      response.status,
-      body,
-      `${response.status} ${response.statusText} for ${path}`,
-    );
+    throw makeError(response.status, body, path, response.statusText);
   }
   if (response.status === 204 || response.headers.get('content-length') === '0') {
     return '';
