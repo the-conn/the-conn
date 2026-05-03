@@ -9,8 +9,10 @@ nodes:
   - name: Lint and Format
     image: node:24-bookworm-slim
     checkout: true
+    volumes:
+      npm: /.npm
     steps:
-      - npm run build
+      - npm install
       - npm run format:check
       - npm run typecheck
       - npm run lint
