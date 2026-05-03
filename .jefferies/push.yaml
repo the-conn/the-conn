@@ -6,10 +6,28 @@ on:
       - main
 
 nodes:
-  - name: Build Image
-    type: build
+  - name: Build The-Conn Image
+    image: quay.io/buildah/stable:latest
     checkout: true
-    config:
-      containerfile: Containerfile
-      tags:
-        - quay.io/the-conn/the-conn
+    privileged: true
+    env:
+      STORAGE_DRIVER: vfs
+    secrets:
+      env:
+        - QUAY_USERNAME
+        - QUAY_PASSWORD
+    steps:
+      - buildah login -u $QUAY_USERNAME -p $QUAY_PASSWORD quay.io
+      - buildah bud -f Containerfile -t quay.io/the-conn/the-conn .
+      - buildah push quay.io/the-conn/the-conn
+
+  - name: Rollout Jefferies Deployment
+    image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+    after: ["Build The-Conn Image"]
+    env:
+      KUBECONFIG: /etc/tube/secrets/files/KUBECONFIG
+    secrets:
+      files:
+        - KUBECONFIG
+    steps:
+      - oc --kubeconfig=$KUBECONFIG -n the-conn rollout restart deployment the-conn
