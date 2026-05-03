@@ -10,7 +10,7 @@ nodes:
     image: node:24-bookworm-slim
     checkout: true
     steps:
-      - npm install
+      - npm build
       - npm run format:check
       - npm run typecheck
       - npm run lint
