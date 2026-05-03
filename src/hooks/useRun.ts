@@ -7,12 +7,12 @@ import { getRunState } from '@/utils/runStatus';
 const RUNNING_INTERVAL = 5_000;
 const SETTLED_INTERVAL = 60_000;
 
-export function useRun(runId: string | null) {
+export function useRun(slug: string, runId: string | null) {
   return useQuery({
-    queryKey: runId ? queryKeys.runs.detail(runId) : ['runs', 'detail', '__none'],
+    queryKey: runId ? queryKeys.runs.detail(slug, runId) : ['runs', slug, 'detail', '__none'],
     queryFn: () => {
       if (!runId) throw new Error('runId is required');
-      return getRun(runId);
+      return getRun(slug, runId);
     },
     enabled: !!runId,
     refetchInterval: (query) => {

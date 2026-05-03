@@ -5,19 +5,20 @@ import { Loader2, RefreshCw, Square } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { RUNS_LIST_KEY, queryKeys } from '@/services/queryKeys';
+import { queryKeys, runsListKey } from '@/services/queryKeys';
 import { cancelRun, retryRun } from '@/services/runs';
 import type { Run } from '@/types/api';
 import { getRunState } from '@/utils/runStatus';
 
 interface ExecutionActionsProps {
+  slug: string;
   run: Run;
 }
 
 const SETTLE_DEADLINE_MS = 30_000;
 const SETTLE_INTERVAL_MS = 1_500;
 
-export function ExecutionActions({ run }: ExecutionActionsProps) {
+export function ExecutionActions({ slug, run }: ExecutionActionsProps) {
   const queryClient = useQueryClient();
   const router = useRouter();
   const state = getRunState(run);
@@ -32,18 +33,18 @@ export function ExecutionActions({ run }: ExecutionActionsProps) {
   }, []);
 
   const retry = useMutation({
-    mutationFn: () => retryRun(run.run_id),
+    mutationFn: () => retryRun(slug, run.run_id),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: RUNS_LIST_KEY });
+      queryClient.invalidateQueries({ queryKey: runsListKey(slug) });
       if (data?.run_id && data.run_id !== run.run_id) {
-        router.push(`/runs/${data.run_id}`);
+        router.push(`/${encodeURIComponent(slug)}/runs/${data.run_id}`);
       }
     },
   });
 
   const awaitSettlement = useCallback(async () => {
-    const detailKey = queryKeys.runs.detail(run.run_id);
-    const nodesKey = queryKeys.runs.nodes(run.run_id);
+    const detailKey = queryKeys.runs.detail(slug, run.run_id);
+    const nodesKey = queryKeys.runs.nodes(slug, run.run_id);
     const deadline = Date.now() + SETTLE_DEADLINE_MS;
 
     while (Date.now() < deadline && !settleAbortRef.current.aborted) {
@@ -56,19 +57,19 @@ export function ExecutionActions({ run }: ExecutionActionsProps) {
       if (latest && latest.status !== 'in_progress' && latest.completed_at !== null) return;
       await new Promise((resolve) => setTimeout(resolve, SETTLE_INTERVAL_MS));
     }
-  }, [queryClient, run.run_id]);
+  }, [queryClient, slug, run.run_id]);
 
   const cancel = useMutation({
-    mutationFn: () => cancelRun(run.run_id),
+    mutationFn: () => cancelRun(slug, run.run_id),
     onSuccess: async () => {
       settleAbortRef.current.aborted = false;
       setSettling(true);
-      queryClient.invalidateQueries({ queryKey: RUNS_LIST_KEY });
+      queryClient.invalidateQueries({ queryKey: runsListKey(slug) });
       try {
         await awaitSettlement();
       } finally {
         if (!settleAbortRef.current.aborted) {
-          queryClient.invalidateQueries({ queryKey: RUNS_LIST_KEY });
+          queryClient.invalidateQueries({ queryKey: runsListKey(slug) });
           setSettling(false);
         }
       }

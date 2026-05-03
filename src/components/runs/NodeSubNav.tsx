@@ -10,14 +10,18 @@ import type { NodeState } from '@/types/ui';
 import { withSearchParams } from '@/utils/href';
 
 interface NodeSubNavProps {
+  slug: string;
   runId: string;
   node: NodeExecution;
   state: NodeState;
 }
 
-export function NodeSubNav({ runId, node, state }: NodeSubNavProps) {
+export function NodeSubNav({ slug, runId, node, state }: NodeSubNavProps) {
   const searchParams = useSearchParams();
-  const backHref = withSearchParams(`/runs/${encodeURIComponent(runId)}`, searchParams);
+  const backHref = withSearchParams(
+    `/${encodeURIComponent(slug)}/runs/${encodeURIComponent(runId)}`,
+    searchParams,
+  );
   return (
     <div className="flex items-center gap-3 px-[18px] py-[8px] border-b border-ink-trace bg-paper-2">
       <Link

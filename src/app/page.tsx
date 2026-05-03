@@ -1,5 +1,5 @@
-import { ExecutionDeckIdle } from '@/components/runs/ExecutionDeckIdle';
+import { RootRedirect } from '@/components/layout/RootRedirect';
 
 export default function HomePage() {
-  return <ExecutionDeckIdle />;
+  return <RootRedirect />;
 }

@@ -6,10 +6,11 @@ import { getGitTriggerUrl } from '@/utils/gitUrl';
 import { shortSha } from '@/utils/time';
 
 interface MetadataGridProps {
+  slug: string;
   run: Run;
 }
 
-export function MetadataGrid({ run }: MetadataGridProps) {
+export function MetadataGrid({ slug, run }: MetadataGridProps) {
   return (
     <div className="grid gap-[10px] grid-cols-[1.4fr_1fr_1fr_1fr_0.9fr]">
       <Cell label="trigger">
@@ -29,7 +30,7 @@ export function MetadataGrid({ run }: MetadataGridProps) {
       {run.retry_of ? (
         <Cell label="retry of">
           <Link
-            href={`/runs/${run.retry_of}`}
+            href={`/${encodeURIComponent(slug)}/runs/${run.retry_of}`}
             className="font-mono text-[12px] font-semibold text-trigger-retry underline hover:opacity-80"
           >
             ↪ {run.retry_of.slice(0, 8)}

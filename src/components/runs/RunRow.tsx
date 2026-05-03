@@ -11,17 +11,18 @@ import { NODE_SPEC, getRunState } from '@/utils/runStatus';
 import { formatRelative, shortSha } from '@/utils/time';
 
 interface RunRowProps {
+  slug: string;
   run: Run;
   isActive: boolean;
 }
 
-export function RunRow({ run, isActive }: RunRowProps) {
+export function RunRow({ slug, run, isActive }: RunRowProps) {
   const searchParams = useSearchParams();
   const state = getRunState(run);
   const spec = NODE_SPEC[state];
   const recency = formatRelative(run.created_at);
   const repoTail = run.repo;
-  const href = withSearchParams(`/runs/${run.run_id}`, searchParams);
+  const href = withSearchParams(`/${encodeURIComponent(slug)}/runs/${run.run_id}`, searchParams);
 
   return (
     <Link

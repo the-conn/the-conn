@@ -18,12 +18,16 @@ export interface UseRunsResult {
 
 const EMPTY_FILTERS: RunFilters = {};
 
-export function useRuns(page: number, filters: RunFilters = EMPTY_FILTERS): UseRunsResult {
+export function useRuns(
+  slug: string,
+  page: number,
+  filters: RunFilters = EMPTY_FILTERS,
+): UseRunsResult {
   const limit = SIDEBAR_LIMIT;
   const query = useQuery({
-    queryKey: queryKeys.runs.list(page, limit, filters),
+    queryKey: queryKeys.runs.list(slug, page, limit, filters),
     queryFn: () =>
-      listRuns({
+      listRuns(slug, {
         limit,
         offset: page * limit,
         sort_by: 'created_at',
