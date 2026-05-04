@@ -31,8 +31,10 @@ This document defines the architectural patterns and coding standards for **The 
 
 ## 4. Data Fetching & State
 * **Polling:** Use TanStack Query for background synchronization.
-  * The **Sidebar** should poll frequently (e.g., 30s).
-  * The **Pipeline Detail** should poll more aggressively (e.g., 5s) if the run status is `ENGAGED`.
+  * Default to a **5s** interval for the sidebar, pipeline detail, and node detail views — favor freshness; the backend is built to scale.
+  * Drop to a slow interval (60s) only when the resource is fully settled (e.g., every node has a non-null `success`).
+  * **Cadence must be derived from the query's own data**, not from a sibling query. Passing an `isRunning` flag from one query to another causes them to drift out of sync — the run can flip to terminal while the nodes endpoint is still mid-poll, leaving the slower query stuck on stale data for up to 60s.
+  * On a known transition (e.g., `run.status` flipping from `in_progress` to terminal), force an immediate `refetch()` of dependent queries instead of waiting for the next tick.
 * **URL as Source of Truth:** The `run_id` must always be managed via the URL route (`/runs/[run_id]`). Do not store the "active run" in global state (Zustand/Redux) if it can be derived from the path.
 * **Isolation:** The "Sync" action must trigger an invalidation of the `runs` query key without affecting the `run-detail` query key.
 

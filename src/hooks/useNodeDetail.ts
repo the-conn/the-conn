@@ -6,12 +6,7 @@ import type { NodeExecution } from '@/types/api';
 const RUNNING_INTERVAL = 5_000;
 const SETTLED_INTERVAL = 60_000;
 
-export function useNodeDetail(
-  slug: string,
-  runId: string | null,
-  nodeName: string | null,
-  isRunning: boolean,
-) {
+export function useNodeDetail(slug: string, runId: string | null, nodeName: string | null) {
   return useQuery({
     queryKey:
       runId && nodeName
@@ -22,7 +17,11 @@ export function useNodeDetail(
       return getRunNode(slug, runId, nodeName);
     },
     enabled: !!runId && !!nodeName,
-    refetchInterval: isRunning ? RUNNING_INTERVAL : SETTLED_INTERVAL,
+    refetchInterval: (query) => {
+      const data = query.state.data as NodeExecution | undefined;
+      if (!data) return RUNNING_INTERVAL;
+      return data.success === null ? RUNNING_INTERVAL : SETTLED_INTERVAL;
+    },
     refetchIntervalInBackground: false,
   });
 }

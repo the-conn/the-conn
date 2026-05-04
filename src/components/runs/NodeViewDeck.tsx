@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { LogViewer } from '@/components/runs/LogViewer';
 import { NodeSubNav } from '@/components/runs/NodeSubNav';
 import { NodeTimingSidebar } from '@/components/runs/NodeTimingSidebar';
@@ -8,7 +9,7 @@ import { Mono } from '@/components/ui/Mono';
 import { useNodeDetail } from '@/hooks/useNodeDetail';
 import { useNodeLogs } from '@/hooks/useNodeLogs';
 import { useRun } from '@/hooks/useRun';
-import { getNodeState, getRunState } from '@/utils/runStatus';
+import { getNodeState } from '@/utils/runStatus';
 
 interface NodeViewDeckProps {
   slug: string;
@@ -18,15 +19,25 @@ interface NodeViewDeckProps {
 
 export function NodeViewDeck({ slug, runId, nodeName }: NodeViewDeckProps) {
   const runQuery = useRun(slug, runId);
-  const runIsRunning = runQuery.data ? getRunState(runQuery.data) === 'running' : false;
-  const nodeQuery = useNodeDetail(slug, runId, nodeName, runIsRunning);
+  const nodeQuery = useNodeDetail(slug, runId, nodeName);
+
+  const runStatus = runQuery.data?.status;
+  const prevStatusRef = useRef(runStatus);
+  const refetchNode = nodeQuery.refetch;
+  useEffect(() => {
+    const prev = prevStatusRef.current;
+    prevStatusRef.current = runStatus;
+    if (prev === 'in_progress' && runStatus !== undefined && runStatus !== 'in_progress') {
+      refetchNode();
+    }
+  }, [runStatus, refetchNode]);
 
   const node = nodeQuery.data;
   const runTerminated = runQuery.data ? runQuery.data.status !== 'in_progress' : false;
   const state = node ? getNodeState(node, runTerminated) : 'pending';
   const nodeIsRunning = state === 'running' || state === 'pending';
 
-  const logsQuery = useNodeLogs(slug, runId, nodeName, runIsRunning && nodeIsRunning);
+  const logsQuery = useNodeLogs(slug, runId, nodeName, nodeIsRunning);
 
   if (nodeQuery.isLoading || runQuery.isLoading) {
     return (

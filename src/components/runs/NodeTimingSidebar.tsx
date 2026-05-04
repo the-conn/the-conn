@@ -26,6 +26,7 @@ export function NodeTimingSidebar({ node, state }: NodeTimingSidebarProps) {
   const exitLabel =
     node.success === true ? 'success (code 0)' : node.success === false ? 'failure (code 1)' : '—';
   const exitClass = node.success === false ? 'text-rose-conn' : 'text-ink';
+  const successLabel = node.success === null ? '—' : String(node.success);
 
   return (
     <aside className="w-[320px] shrink-0 border-r-[1.2px] border-ink/85 bg-paper px-[16px] pt-[16px] pb-[14px] flex flex-col gap-[14px] overflow-auto">
@@ -41,7 +42,7 @@ export function NodeTimingSidebar({ node, state }: NodeTimingSidebarProps) {
           <span className={`font-mono text-[12px] font-semibold ${exitClass}`}>{exitLabel}</span>
         </KV>
         <KV label="success">
-          <Mono size={12}>{String(node.success)}</Mono>
+          <Mono size={12}>{successLabel}</Mono>
         </KV>
       </Section>
 

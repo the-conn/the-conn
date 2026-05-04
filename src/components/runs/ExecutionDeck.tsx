@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { ExecutionActions } from '@/components/runs/ExecutionActions';
 import { GanttTimeline } from '@/components/runs/GanttTimeline';
 import { MetadataGrid } from '@/components/runs/MetadataGrid';
@@ -9,7 +10,6 @@ import { useRun } from '@/hooks/useRun';
 import { useRunNodes } from '@/hooks/useRunNodes';
 import { Mono } from '@/components/ui/Mono';
 import { HandHeader } from '@/components/ui/HandHeader';
-import { getRunState } from '@/utils/runStatus';
 
 interface ExecutionDeckProps {
   slug: string;
@@ -18,8 +18,18 @@ interface ExecutionDeckProps {
 
 export function ExecutionDeck({ slug, runId }: ExecutionDeckProps) {
   const runQuery = useRun(slug, runId);
-  const isRunning = runQuery.data ? getRunState(runQuery.data) === 'running' : false;
-  const nodesQuery = useRunNodes(slug, runId, isRunning);
+  const nodesQuery = useRunNodes(slug, runId);
+
+  const runStatus = runQuery.data?.status;
+  const prevStatusRef = useRef(runStatus);
+  const refetchNodes = nodesQuery.refetch;
+  useEffect(() => {
+    const prev = prevStatusRef.current;
+    prevStatusRef.current = runStatus;
+    if (prev === 'in_progress' && runStatus !== undefined && runStatus !== 'in_progress') {
+      refetchNodes();
+    }
+  }, [runStatus, refetchNodes]);
 
   if (runQuery.isLoading) {
     return <DeckMessage label="loading run telemetry…" />;

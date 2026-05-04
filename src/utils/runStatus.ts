@@ -17,10 +17,9 @@ export function getRunState(run: Run): RunState {
 export function getNodeState(node: NodeExecution, runTerminated = false): NodeState {
   if (node.success === true) return 'pass';
   if (node.success === false) return 'fail';
-  if (runTerminated) return 'cancelled';
   if (node.started_at !== null && node.completed_at === null) return 'running';
-  if (node.started_at === null) return 'pending';
-  return 'cancelled';
+  if (node.started_at !== null && node.completed_at !== null) return 'cancelled';
+  return runTerminated ? 'cancelled' : 'pending';
 }
 
 interface BannerSpec {
