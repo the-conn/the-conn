@@ -21,7 +21,7 @@ nodes:
       - buildah bud -f Containerfile -t quay.io/the-conn/the-conn .
       - buildah push quay.io/the-conn/the-conn
 
-  - name: Rollout Jefferies Deployment
+  - name: Rollout The-Conn Deployment
     image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
     after: ["Build The-Conn Image"]
     env:
